@@ -1,0 +1,13 @@
+overwrite: true
+schema: 'src/graphql/schema.graphql'
+generates:
+  'src/generated/graphql.ts':
+    plugins:
+      - 'typescript'
+      - 'typescript-resolvers'
+    config:
+      contextType: '../context#GQLContext'
+      # map scalars to native types (change if you later use custom scalars)
+      scalars:
+        DateTime: 'string'
+        String: 'string'

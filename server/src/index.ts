@@ -1,6 +1,12 @@
 /**
  * minimal dev entry. we'll replace this with Apollo/Express in Step 2
  */
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load .env from monorepo root (one level up from server/)
+dotenv.config({ path: path.join(process.cwd(), '..', '.env') });
+
 import http from 'http';
 import express from 'express';
 import cors from 'cors';
@@ -8,6 +14,8 @@ import { uptime } from 'process';
 import { ApolloServer } from 'apollo-server-express';
 import { resolvers, typeDefs } from 'server/src/graphql/schema';
 import { createContext } from 'server/src/context';
+import { closeMongo, connectMongo } from 'server/src/db/client';
+import { ensureIndexes } from 'server/src/db/indexHelper';
 const port = process.env.PORT ?? 4000;
 
 const allowedOrigins = [
@@ -23,6 +31,14 @@ async function startServer() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  try {
+    await connectMongo();
+    await ensureIndexes();
+  } catch (error) {
+    console.error('Failed to connect to MongoDB:', error);
+    process.exit(1);
+  }
+
   app.get('/healthz', (_req, res) => res.json({ ok: true, uptime: uptime() }));
 
   const server = new ApolloServer({
@@ -37,8 +53,26 @@ async function startServer() {
 
   const httpServer = http.createServer(app);
   httpServer.listen({ port }, () => {
+    console.log('Server is running on port', port);
     console.log(`Server ready at http://localhost:${port}${server.graphqlPath}`);
   });
+
+  const shutdown = async () => {
+    console.log('Received shutdown signal, closing server..');
+    await server.stop();
+    httpServer.close(async err => {
+      if (err) {
+        console.log('HTTP server close error:', err);
+        process.exit(1);
+      }
+      await closeMongo();
+      console.log('MongoDB closed');
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
 }
 
 startServer().catch(console.error);

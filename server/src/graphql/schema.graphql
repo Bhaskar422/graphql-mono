@@ -1,0 +1,91 @@
+# """
+# GraphQL SDL for the blog domain (User + Post)."""
+# """
+# User - represents an account in the system
+# """
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  role: Role!
+  createdAt: String!
+  updatedAt: String!
+  # note: we intentionally avoid returning password hashes
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+# """
+# Post - blog post authored by a User
+# """
+type Post {
+  id: ID!
+  title: String!
+  body: String!
+  tags: [String!]!
+  ownerId: ID! # reference to User.id
+  createdAt: String!
+  updatedAt: String!
+  softDeleted: Boolean! # soft-delete flag (true => hidden)
+}
+
+# """
+# Pagination cursor type for cursor-based pagination
+# """
+type PostEdge {
+  cursor: String!
+  node: Post!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+type PostConnection {
+  edges: [PostEdge!]!
+  pageInfo: PageInfo!
+}
+
+# """
+# Root Query
+# """
+type Query {
+  hello(name: String): String!
+  me: User
+  post(id: ID!): Post
+  posts(
+    after: String
+    limit: Int = 10
+    ownerId: ID
+    tags: [String!]
+    includeSoftDeleted: Boolean = false
+    q: String # text search
+  ): PostConnection!
+}
+
+# """
+# Input for creating/updating posts
+# """
+input CreatePostInput {
+  title: String!
+  body: String!
+  tags: [String!]
+}
+
+input UpdatePostInput {
+  id: ID!
+  title: String
+  body: String
+  tags: [String!]
+}
+
+type Mutation {
+  createPost(input: CreatePostInput!): Post!
+  updatePost(input: UpdatePostInput!): Post!
+  softDeletePost(id: ID!): Post!
+  restorePost(id: ID!): Post!
+}
