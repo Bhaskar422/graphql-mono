@@ -23,9 +23,18 @@ export type CreatePostInput = {
   title: Scalars['String']['input'];
 };
 
+export type LoginInput = {
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createPost: Post;
+  createUser: User;
+  login: User;
+  logout: Scalars['Boolean']['output'];
+  refreshToken: RefreshTokenResponse;
   restorePost: Post;
   softDeletePost: Post;
   updatePost: Post;
@@ -34,6 +43,16 @@ export type Mutation = {
 
 export type MutationCreatePostArgs = {
   input: CreatePostInput;
+};
+
+
+export type MutationCreateUserArgs = {
+  input: SignupInput;
+};
+
+
+export type MutationLoginArgs = {
+  input: LoginInput;
 };
 
 
@@ -109,10 +128,21 @@ export type QueryPostsArgs = {
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
+export type RefreshTokenResponse = {
+  __typename?: 'RefreshTokenResponse';
+  accessToken: Scalars['String']['output'];
+};
+
 export enum Role {
   Admin = 'ADMIN',
   User = 'USER'
 }
+
+export type SignupInput = {
+  email: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
 
 export type UpdatePostInput = {
   body?: InputMaybe<Scalars['String']['input']>;
@@ -208,13 +238,16 @@ export type ResolversTypes = {
   CreatePostInput: CreatePostInput;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  LoginInput: LoginInput;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   PageInfo: ResolverTypeWrapper<PageInfo>;
   Post: ResolverTypeWrapper<Post>;
   PostConnection: ResolverTypeWrapper<PostConnection>;
   PostEdge: ResolverTypeWrapper<PostEdge>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
+  RefreshTokenResponse: ResolverTypeWrapper<RefreshTokenResponse>;
   Role: Role;
+  SignupInput: SignupInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   UpdatePostInput: UpdatePostInput;
   User: ResolverTypeWrapper<User>;
@@ -226,12 +259,15 @@ export type ResolversParentTypes = {
   CreatePostInput: CreatePostInput;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
+  LoginInput: LoginInput;
   Mutation: Record<PropertyKey, never>;
   PageInfo: PageInfo;
   Post: Post;
   PostConnection: PostConnection;
   PostEdge: PostEdge;
   Query: Record<PropertyKey, never>;
+  RefreshTokenResponse: RefreshTokenResponse;
+  SignupInput: SignupInput;
   String: Scalars['String']['output'];
   UpdatePostInput: UpdatePostInput;
   User: User;
@@ -239,6 +275,10 @@ export type ResolversParentTypes = {
 
 export type MutationResolvers<ContextType = GQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationCreatePostArgs, 'input'>>;
+  createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
+  login?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
+  logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  refreshToken?: Resolver<ResolversTypes['RefreshTokenResponse'], ParentType, ContextType>;
   restorePost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationRestorePostArgs, 'id'>>;
   softDeletePost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationSoftDeletePostArgs, 'id'>>;
   updatePost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationUpdatePostArgs, 'input'>>;
@@ -277,6 +317,10 @@ export type QueryResolvers<ContextType = GQLContext, ParentType extends Resolver
   posts?: Resolver<ResolversTypes['PostConnection'], ParentType, ContextType, RequireFields<QueryPostsArgs, 'includeSoftDeleted' | 'limit'>>;
 };
 
+export type RefreshTokenResponseResolvers<ContextType = GQLContext, ParentType extends ResolversParentTypes['RefreshTokenResponse'] = ResolversParentTypes['RefreshTokenResponse']> = {
+  accessToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+};
+
 export type UserResolvers<ContextType = GQLContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -293,6 +337,7 @@ export type Resolvers<ContextType = GQLContext> = {
   PostConnection?: PostConnectionResolvers<ContextType>;
   PostEdge?: PostEdgeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  RefreshTokenResponse?: RefreshTokenResponseResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
 

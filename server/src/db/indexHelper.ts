@@ -17,5 +17,7 @@ export async function ensureIndexes() {
       { title: 'text', body: 'text', tags: 'text' },
       { name: 'posts_text_idx', default_language: 'english' },
     );
+
+  await db.collection('refreshTokens').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
   console.log('Indexes created successfully');
 }

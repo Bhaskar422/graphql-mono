@@ -1,22 +1,23 @@
 /**
  * minimal dev entry. we'll replace this with Apollo/Express in Step 2
  */
-import dotenv from 'dotenv';
-import path from 'path';
 
-// Load .env from monorepo root (one level up from server/)
-dotenv.config({ path: path.join(process.cwd(), '..', '.env') });
-
+// Import modules that depend on env vars AFTER dotenv.config()
 import http from 'http';
 import express from 'express';
 import cors from 'cors';
 import { uptime } from 'process';
 import { ApolloServer } from 'apollo-server-express';
+import cookieParser from 'cookie-parser';
 import { resolvers, typeDefs } from 'server/src/graphql/schema';
 import { createContext } from 'server/src/context';
 import { closeMongo, connectMongo } from 'server/src/db/client';
 import { ensureIndexes } from 'server/src/db/indexHelper';
-const port = process.env.PORT ?? 4000;
+import { env } from 'server/src/config/env';
+const port = env.PORT;
+if (!port) {
+  throw new Error('PORT is not set');
+}
 
 const allowedOrigins = [
   'http://localhost:5173',
@@ -29,6 +30,7 @@ async function startServer() {
   const app = express();
   app.use(cors({ origin: allowedOrigins, credentials: true }));
   app.use(express.json());
+  app.use(cookieParser());
   app.use(express.urlencoded({ extended: true }));
 
   try {

@@ -83,7 +83,26 @@ input UpdatePostInput {
   tags: [String!]
 }
 
+input SignupInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type RefreshTokenResponse {
+  accessToken: String!
+}
+
 type Mutation {
+  createUser(input: SignupInput!): User!
+  login(input: LoginInput!): User!
+  logout: Boolean!
+  refreshToken: RefreshTokenResponse!
   createPost(input: CreatePostInput!): Post!
   updatePost(input: UpdatePostInput!): Post!
   softDeletePost(id: ID!): Post!

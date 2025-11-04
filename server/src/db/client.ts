@@ -4,28 +4,29 @@
  * - Keeps one client across the app lifecycle (recommended).
  */
 import { MongoClient, Db } from 'mongodb';
+import { env } from '../config/env';
 
+const MONGO_URI = env.MONGO_URI;
+const DB_NAME = env.DB_NAME;
+
+if (!MONGO_URI) {
+  throw new Error('MONGO_URI is not set');
+}
+
+if (!DB_NAME) {
+  throw new Error('DB_NAME is not set');
+}
 let client: MongoClient | null = null;
 let db: Db | null = null;
 
 export async function connectMongo(): Promise<Db> {
   if (db) return db;
 
-  const MONGO_URI = process.env.MONGO_URI;
-  if (!MONGO_URI) {
-    throw new Error('MONGO_URI is not set');
-  }
-
-  const dbName = process.env.DB_NAME;
-  if (!dbName) {
-    throw new Error('DB_NAME is not set');
-  }
-
   client = new MongoClient(MONGO_URI, {});
 
   await client.connect();
-  db = client.db(dbName);
-  console.log(`Connected to MongoDB: ${dbName}`);
+  db = client.db(DB_NAME);
+  console.log(`Connected to MongoDB: ${DB_NAME}`);
   return db;
 }
 
