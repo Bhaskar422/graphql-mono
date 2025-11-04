@@ -1,0 +1,9 @@
+{
+    "name": "notes",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+      "start": "echo 'open notes/README.md' && exit 0"
+    }
+  }
+  
