@@ -10,6 +10,7 @@ import { gql } from 'apollo-server-express';
 import type { GQLContext } from '../context';
 import { Resolvers } from 'server/src/generated/graphql';
 import { authResolvers } from 'server/src/graphql/resolvers/auth';
+import { postResolvers } from 'server/src/graphql/resolvers/post';
 
 const sdl = readFileSync(join(__dirname, '..', 'graphql', 'schema.graphql'), 'utf-8');
 
@@ -19,8 +20,9 @@ export const typeDefs = gql(sdl);
  * For larger projects, split resolvers per domain.
  */
 export const resolvers: Resolvers = {
-  ...authResolvers,
   Query: {
+    ...authResolvers.Query,
+    ...postResolvers.Query,
     hello(_parent, args, _ctx) {
       // Example usage of context: access headers or auth later
       // const authHeader = ctx.req.headers.authorization;
@@ -28,5 +30,8 @@ export const resolvers: Resolvers = {
       return `Hello, ${who}! (from GraphQL)`;
     },
   },
-  //   Mutation: {},
+  Mutation: {
+    ...authResolvers.Mutation,
+    ...postResolvers.Mutation,
+  },
 };

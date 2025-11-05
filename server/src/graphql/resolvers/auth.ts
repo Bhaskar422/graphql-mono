@@ -27,8 +27,8 @@ function setRefreshCookie(res: any, token: string, maxAgeMs: number) {
   const secure = process.env.NODE_ENV === 'production';
   res.cookie(REFRESH_COOKIE_NAME, token, {
     httpOnly: true,
-    sameSite: 'strict',
-    secure,
+    sameSite: 'none',
+    secure: true,
     maxAge: maxAgeMs,
     path: '/',
   });
@@ -128,6 +128,7 @@ export const authResolvers: Resolvers = {
         name: user.name,
         email: user.email,
         role,
+        accessToken: access,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       };
